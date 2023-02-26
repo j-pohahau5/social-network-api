@@ -41,13 +41,8 @@ const userSchema = new Schema(
 userSchema
   .virtual('friendCount')
   .get(function () {
-    return `${this.first} ${this.last}`;
+    return this.friends.length;
   })
-  .set(function (v) {
-    const first = v.split(' ')[0];
-    const last = v.split(' ')[1];
-    this.set({ first, last });
-  });
 
 const User = model('user', userSchema);
 

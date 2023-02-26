@@ -35,14 +35,8 @@ const thoughtSchema = new Schema(
   thoughtSchema
   .virtual('reactionCount')
   .get(function () {
-    return `${this.first} ${this.last}`;
+    return this.reactions.length;
   })
-  .set(function (v) {
-    const first = v.split(' ')[0];
-    const last = v.split(' ')[1];
-    this.set({ first, last });
-  });
-
 
   const Thought = model('thought', thoughtSchema);
   
