@@ -91,12 +91,12 @@ module.exports = {
   },
 
   // Add an thought to a user
-  addThought(req, res) {
+  addFriend(req, res) {
     console.log('You are adding an thought');
     console.log(req.body);
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $addToSet: { thoughts: req.body } },
+      { $addToSet: { friends: req.body } },
       { runValidators: true, new: true }
     )
       .then((user) =>
@@ -109,10 +109,10 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
   // Remove thought from a user
-  removeThought(req, res) {
+  removeFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $pull: { thought: { thoughtId: req.params.thoughtId } } },
+      { $pull: { friend: { friendId: req.params.friendId } } },
       { runValidators: true, new: true }
     )
       .then((user) =>
