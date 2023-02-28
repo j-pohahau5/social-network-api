@@ -133,16 +133,17 @@ module.exports = {
   },
   // Remove thought from a user
   removeFriend(req, res) {
-    User.findOneAndUpdate(
-      { _id: req.params.userId },
-      { $pull: { friend: { _id: req.params.friendId } } },
-      { runValidators: true, new: true }
-    )
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: "No user found with that ID :(" })
-          : res.json(user)
+      // Remove friend from user's friends array
+      User.updateOne(
+        { _id: req.params.userId },
+        { $pull: { friends: req.params.friendId } }
       )
-      .catch((err) => res.status(500).json(err));
+        .then(({ nModified }) => {
+          if (nModified === 0) {
+            return res.status(404).json({ message: "Friend not found" });
+          }
+          return res.json({ message: "Friend removed successfully" });
+        })
+        .catch((err) => res.status(500).json(err));
   },
 };
