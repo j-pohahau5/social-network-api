@@ -5,7 +5,7 @@ const reactions = async (thoughtId) =>
     // only include the given student by using $match
     { $match: { _id: ObjectId(thoughtId) } },
     {
-      $unwind: '$reactions',
+      $unwind: "$reactions",
     },
     {
       $group: {
@@ -29,14 +29,20 @@ module.exports = {
       .then((thought) =>
         !thought
           ? res.status(404).json({ message: "No thought with that ID" })
-          : res.json(course)
+          : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
   },
   // Create a thought
   createThought(req, res) {
     Thought.create(req.body)
-      .then((thought) => res.json(thought))
+      .then((thought) => {
+        return User.findOneAndUpdate(
+          { username: req.body.username },
+          { $addToSet: { thoughts: thought._id } },
+          { new: true }
+        );
+      })
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
@@ -67,9 +73,9 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
-  // adding a reaction 
+  // adding a reaction
   createReaction(req, res) {
-    console.log('You are adding an reaction');
+    console.log("You are adding an reaction");
     console.log(req.body);
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
@@ -80,25 +86,25 @@ module.exports = {
         !thought
           ? res
               .status(404)
-              .json({ message: 'No thought found with that ID :(' })
+              .json({ message: "No thought found with that ID :(" })
           : res.json(thought)
       )
       .catch((err) => res.status(500).json(err));
   },
-  // deleting a reaction  
+  // deleting a reaction
   deleteReaction(req, res) {
     Thought.findOneAndUpdate(
-        { _id: req.params.thoughtId },
-        { $pull: { reactions: { reactionId: req.params.reactionId } } },
-        { runValidators: true, new: true }
+      { _id: req.params.thoughtId },
+      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { runValidators: true, new: true }
+    )
+      .then((thought) =>
+        !thought
+          ? res
+              .status(404)
+              .json({ message: "No thought found with that ID :(" })
+          : res.json(thought)
       )
-        .then((thought) =>
-          !thought
-            ? res
-                .status(404)
-                .json({ message: 'No thought found with that ID :(' })
-            : res.json(thought)
-        )
-        .catch((err) => res.status(500).json(err));
+      .catch((err) => res.status(500).json(err));
   },
 };

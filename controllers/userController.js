@@ -41,29 +41,31 @@ module.exports = {
       });
   },
   // Get a single user
+//   .then((thought) =>
+//             Thought.find(
+//               { user: req.params.userId },
+//               { $pull: { users: req.params.userId } },
+//               { new: true }
+//               !thought
+//                 ? res.status(404).json({
+//                     message: "User found, but no thoughts found",
+//                   })
+//                 : res.json({
+//                     user,
+//                     friendCount: friendCount(),
+//                     // need to check if i switch grade to thoughts
+//                     thoughts: thoughts(req.params.userId),
+//                   })
+//             )
+//       )
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId })
       .select("-__v")
       .then(async (user) =>
         !user
           ? res.status(404).json({ message: "No user with that ID" })
-          : Thought.find(
-              { users: req.params.userId },
-              { $pull: { users: req.params.userId } },
-              { new: true }
-            ).then((thought) =>
-              !thought
-                ? res.status(404).json({
-                    message: "User found, but no thoughts found",
-                  })
-                : res.json({
-                    user,
-                    friendCount: friendCount(),
-                    // need to check if i switch grade to thoughts
-                    thoughts: thoughts(req.params.userId),
-                  })
+          : res.json(user)
             )
-      )
       .catch((err) => {
         console.log(err);
         return res.status(500).json(err);
@@ -115,11 +117,11 @@ module.exports = {
   },
   // Add an thought to a user
   addFriend(req, res) {
-    console.log("You are adding an thought");
+    console.log("You are adding an friend");
     console.log(req.body);
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $addToSet: { friends: req.body } },
+      { $addToSet: { friends: { _id: req.params.friendId } } },
       { runValidators: true, new: true }
     )
       .then((user) =>
