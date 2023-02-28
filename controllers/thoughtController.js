@@ -85,7 +85,7 @@ module.exports = {
     console.log("You are adding an reaction");
     console.log(req.body);
     Thought.findOneAndUpdate(
-      { _id: req.params.thoughtId },
+      { id: req.params.thoughtId },
       { $addToSet: { reactions: req.body } },
       { runValidators: true, new: true }
     )
@@ -100,10 +100,10 @@ module.exports = {
   },
   // deleting a reaction
   deleteReaction(req, res) {
-    Thought.findOneAndUpdate(
-      { _id: req.params.thoughtId },
+    Thought.updateOne(
+      { id: req.params.thoughtId },
       { $pull: { reactions: { reactionId: req.params.reactionId } } },
-      { runValidators: true, new: true }
+    //   { runValidators: true, new: true }
     )
       .then((thought) =>
         !thought
